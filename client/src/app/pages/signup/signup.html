@@ -1,0 +1,26 @@
+<div class="auth-card card">
+  <h1>Create an account</h1>
+
+  <div class="field">
+    <label for="name">Full name</label>
+    <input id="name" type="text" [ngModel]="name()" (ngModelChange)="name.set($event)" />
+  </div>
+  <div class="field">
+    <label for="email">Email</label>
+    <input id="email" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+  </div>
+  <div class="field">
+    <label for="password">Password</label>
+    <input id="password" type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error-text">{{ errorMessage() }}</p>
+  }
+
+  <button class="btn full" type="button" [disabled]="submitting()" (click)="submit()">
+    {{ submitting() ? 'Creating account…' : 'Sign up' }}
+  </button>
+
+  <p class="switch">Already have an account? <a routerLink="/login">Sign in</a></p>
+</div>

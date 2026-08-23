@@ -1,0 +1,77 @@
+<h1>Compare cars</h1>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (cars().length === 0) {
+  <div class="empty card">
+    <p>You haven't added any cars to compare yet.</p>
+    <a routerLink="/" class="btn">Browse cars</a>
+  </div>
+} @else {
+  <div class="table-wrap card">
+    <table>
+      <thead>
+        <tr>
+          <th class="row-label"></th>
+          @for (car of cars(); track car.id) {
+            <th>
+              <img [src]="car.image" [alt]="car.name" />
+              <div class="car-name">{{ car.name }}</div>
+              <button class="btn secondary small" type="button" (click)="remove(car.id)">Remove</button>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Category</td>
+          @for (car of cars(); track car.id) {
+            <td>{{ car.category }}</td>
+          }
+        </tr>
+        <tr>
+          <td class="row-label">Location</td>
+          @for (car of cars(); track car.id) {
+            <td>{{ car.location }}</td>
+          }
+        </tr>
+        <tr>
+          <td class="row-label">Price / day</td>
+          @for (car of cars(); track car.id) {
+            <td class="price">${{ car.price_per_day }}</td>
+          }
+        </tr>
+        <tr>
+          <td class="row-label">Rating</td>
+          @for (car of cars(); track car.id) {
+            <td>★ {{ car.rating }}</td>
+          }
+        </tr>
+        @for (key of metadataKeys(); track key) {
+          <tr>
+            <td class="row-label">{{ formatKey(key) }}</td>
+            @for (car of cars(); track car.id) {
+              <td>{{ car.metadata[key] ?? '—' }}</td>
+            }
+          </tr>
+        }
+        @for (tag of allTags(); track tag) {
+          <tr>
+            <td class="row-label">{{ tag }}</td>
+            @for (car of cars(); track car.id) {
+              <td>{{ car.tags.includes(tag) ? '✓' : '—' }}</td>
+            }
+          </tr>
+        }
+        <tr>
+          <td class="row-label"></td>
+          @for (car of cars(); track car.id) {
+            <td>
+              <a class="btn" [routerLink]="['/cars', car.id]">View &amp; book</a>
+            </td>
+          }
+        </tr>
+      </tbody>
+    </table>
+  </div>
+}

@@ -1,0 +1,73 @@
+<section class="hero">
+  <h1>Find your rental car</h1>
+  <p>Compare cars by price, features, and availability — then book in minutes.</p>
+</section>
+
+<section class="filters card">
+  <div class="field">
+    <label for="pickup">Pickup date</label>
+    <input id="pickup" type="date" [(ngModel)]="pickupDate" />
+  </div>
+  <div class="field">
+    <label for="return">Return date</label>
+    <input id="return" type="date" [(ngModel)]="returnDate" />
+  </div>
+  <div class="field">
+    <label for="category">Category</label>
+    <select id="category" [(ngModel)]="category">
+      <option value="">All categories</option>
+      @for (c of categories(); track c) {
+        <option [value]="c">{{ c }}</option>
+      }
+    </select>
+  </div>
+  <div class="field">
+    <label for="sort">Sort by</label>
+    <select id="sort" [(ngModel)]="sort">
+      <option value="rating-desc">Top rated</option>
+      <option value="price-asc">Price: low to high</option>
+      <option value="price-desc">Price: high to low</option>
+    </select>
+  </div>
+  <button class="btn" type="button" (click)="load()">Search</button>
+</section>
+
+@if (loading()) {
+  <p>Loading cars…</p>
+} @else if (errorMessage()) {
+  <p class="error-text">{{ errorMessage() }}</p>
+} @else if (visibleCars().length === 0) {
+  <p>No cars match your search — try different dates or a different category.</p>
+} @else {
+  <div class="grid">
+    @for (car of visibleCars(); track car.id) {
+      <a class="car-card card" [routerLink]="['/cars', car.id]">
+        <img [src]="car.image" [alt]="car.name" />
+        <div class="body">
+          <div class="title-row">
+            <h3>{{ car.name }}</h3>
+            <span class="rating">★ {{ car.rating }}</span>
+          </div>
+          <p class="meta">{{ car.category }} · {{ car.location }}</p>
+          <div class="tags">
+            @for (tag of car.tags.slice(0, 3); track tag) {
+              <span class="tag">{{ tag }}</span>
+            }
+          </div>
+          <div class="footer-row">
+            <span class="price">${{ car.price_per_day }}<span class="unit">/day</span></span>
+            <label class="compare-toggle" (click)="$event.stopPropagation()">
+              <input
+                type="checkbox"
+                [checked]="compare.isSelected(car.id)"
+                [disabled]="!compare.isSelected(car.id) && !compare.canAddMore()"
+                (click)="toggleCompare(car.id, $event)"
+              />
+              Compare
+            </label>
+          </div>
+        </div>
+      </a>
+    }
+  </div>
+}

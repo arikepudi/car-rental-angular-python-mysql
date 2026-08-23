@@ -1,0 +1,64 @@
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (notFound()) {
+  <div class="card empty">
+    <p>We couldn't find that booking.</p>
+    <a routerLink="/" class="btn">Back to browse</a>
+  </div>
+} @else if (booking(); as booking) {
+  <div class="card confirmation">
+    @if (cancelled()) {
+      <div class="banner cancelled">This booking has been cancelled.</div>
+    } @else {
+      <div class="banner">Booking confirmed 🎉</div>
+    }
+
+    <h1>{{ booking.car_name }}</h1>
+    <p class="ref">Confirmation #{{ booking.id.slice(0, 8) }}</p>
+
+    <dl class="rows">
+      <div class="row">
+        <dt>Pickup</dt>
+        <dd>{{ booking.starts_at | slice: 0 : 10 }}</dd>
+      </div>
+      <div class="row">
+        <dt>Return</dt>
+        <dd>{{ booking.ends_at | slice: 0 : 10 }}</dd>
+      </div>
+      <div class="row">
+        <dt>Rate</dt>
+        <dd>${{ booking.price_per_day }}/day</dd>
+      </div>
+      <div class="row total">
+        <dt>Total charged</dt>
+        <dd>${{ booking.total_price }}</dd>
+      </div>
+      <div class="row">
+        <dt>Booked for</dt>
+        <dd>{{ booking.customer_name }} ({{ booking.email }})</dd>
+      </div>
+    </dl>
+
+    @if (!cancelled()) {
+      @if (booking.cancellable) {
+        <p class="policy">
+          @if (booking.cancellation_fee > 0) {
+            A late cancellation fee of ${{ booking.cancellation_fee }} applies now.
+          } @else {
+            Free cancellation is still available.
+          }
+        </p>
+        @if (cancelError()) {
+          <p class="error-text">{{ cancelError() }}</p>
+        }
+        <button class="btn danger" type="button" [disabled]="cancelling()" (click)="cancel()">
+          {{ cancelling() ? 'Cancelling…' : 'Cancel booking' }}
+        </button>
+      } @else {
+        <p class="policy">This booking can no longer be cancelled.</p>
+      }
+    }
+
+    <a routerLink="/" class="btn secondary browse-more">Browse more cars</a>
+  </div>
+}

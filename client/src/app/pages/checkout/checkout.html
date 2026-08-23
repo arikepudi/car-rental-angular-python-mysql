@@ -1,0 +1,66 @@
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (!draft()) {
+  <div class="card empty">
+    <p>No booking in progress. Choose a car and dates first.</p>
+    <a routerLink="/" class="btn">Browse cars</a>
+  </div>
+} @else if (car(); as car) {
+  <h1>Checkout</h1>
+  <div class="checkout-grid">
+    <div class="summary card">
+      <img [src]="car.image" [alt]="car.name" />
+      <h2>{{ car.name }}</h2>
+      <p class="meta">{{ car.category }} · {{ car.location }}</p>
+      <dl class="rows">
+        <div class="row">
+          <dt>Pickup</dt>
+          <dd>{{ draft()!.startsAt }}</dd>
+        </div>
+        <div class="row">
+          <dt>Return</dt>
+          <dd>{{ draft()!.endsAt }}</dd>
+        </div>
+        <div class="row">
+          <dt>Duration</dt>
+          <dd>{{ rentalDays() }} day{{ rentalDays() === 1 ? '' : 's' }}</dd>
+        </div>
+        <div class="row">
+          <dt>Rate</dt>
+          <dd>${{ car.price_per_day }}/day</dd>
+        </div>
+        <div class="row total">
+          <dt>Estimated total</dt>
+          <dd>${{ estimatedTotal() }}</dd>
+        </div>
+      </dl>
+      <p class="hint">The final price is calculated and confirmed by the server when you submit.</p>
+    </div>
+
+    <div class="form card">
+      <h2>Your details</h2>
+      @if (!session.user()) {
+        <p class="guest-note">
+          Booking as a guest. <a routerLink="/login">Sign in</a> to manage bookings from one place.
+        </p>
+      }
+
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" type="text" [ngModel]="customerName()" (ngModelChange)="customerName.set($event)" />
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+      </div>
+
+      @if (errorMessage()) {
+        <p class="error-text">{{ errorMessage() }}</p>
+      }
+
+      <button class="btn full" type="button" [disabled]="submitting()" (click)="confirmBooking()">
+        {{ submitting() ? 'Confirming…' : 'Confirm Booking' }}
+      </button>
+    </div>
+  </div>
+}

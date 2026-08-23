@@ -1,0 +1,26 @@
+<header class="bar">
+  <div class="bar-inner">
+    <a routerLink="/" class="brand">🚗 RoadReady Rentals</a>
+
+    <nav class="links">
+      <a routerLink="/">Browse</a>
+      <a routerLink="/compare" class="compare-link">
+        Compare
+        @if (compare.ids().length > 0) {
+          <span class="badge">{{ compare.ids().length }}</span>
+        }
+      </a>
+
+      @if (session.ready()) {
+        @if (session.user(); as user) {
+          <a routerLink="/my-bookings">My Bookings</a>
+          <span class="user-name">{{ user.name }}</span>
+          <button class="btn secondary" type="button" (click)="signOut()">Sign out</button>
+        } @else {
+          <a routerLink="/login">Sign in</a>
+          <a routerLink="/signup" class="btn">Sign up</a>
+        }
+      }
+    </nav>
+  </div>
+</header>

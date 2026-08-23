@@ -1,0 +1,40 @@
+<h1>My Bookings</h1>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (!session.user()) {
+  <div class="card empty">
+    <p>Sign in to see your booking history and manage cancellations.</p>
+    <a routerLink="/login" class="btn">Sign in</a>
+  </div>
+} @else if (bookings().length === 0) {
+  <div class="card empty">
+    <p>You don't have any bookings yet.</p>
+    <a routerLink="/" class="btn">Browse cars</a>
+  </div>
+} @else {
+  <div class="list">
+    @for (booking of bookings(); track booking.id) {
+      <div class="card booking-row">
+        <div class="info">
+          <h3>{{ booking.car_name }}</h3>
+          <p class="dates">{{ booking.starts_at.slice(0, 10) }} → {{ booking.ends_at.slice(0, 10) }}</p>
+          <p class="total">${{ booking.total_price }} total</p>
+        </div>
+        <div class="actions">
+          <a class="btn secondary" [routerLink]="['/bookings', booking.id]">View</a>
+          @if (booking.cancellable) {
+            <button
+              class="btn danger"
+              type="button"
+              [disabled]="cancellingId() === booking.id"
+              (click)="cancel(booking)"
+            >
+              {{ cancellingId() === booking.id ? 'Cancelling…' : 'Cancel' }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

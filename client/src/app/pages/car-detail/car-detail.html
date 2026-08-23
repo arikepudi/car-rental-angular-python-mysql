@@ -1,0 +1,68 @@
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (notFound()) {
+  <div class="card empty">
+    <p>We couldn't find that car.</p>
+    <a routerLink="/" class="btn">Back to browse</a>
+  </div>
+} @else if (car(); as car) {
+  <div class="detail-grid">
+    <div class="media card">
+      <img [src]="car.image" [alt]="car.name" />
+    </div>
+
+    <div class="info">
+      <div class="title-row">
+        <h1>{{ car.name }}</h1>
+        <span class="rating">★ {{ car.rating }}</span>
+      </div>
+      <p class="meta">{{ car.category }} · {{ car.location }}</p>
+
+      <div class="tags">
+        @for (tag of car.tags; track tag) {
+          <span class="tag">{{ tag }}</span>
+        }
+      </div>
+
+      <dl class="specs">
+        @for (entry of car.metadata | keyvalue; track entry.key) {
+          <div class="spec">
+            <dt>{{ entry.key }}</dt>
+            <dd>{{ entry.value }}</dd>
+          </div>
+        }
+      </dl>
+
+      <button class="btn secondary" type="button" (click)="toggleCompare()">
+        {{ compare.isSelected(car.id) ? 'Remove from compare' : 'Add to compare' }}
+      </button>
+    </div>
+
+    <div class="booking card">
+      <h2>${{ car.price_per_day }}<span class="unit">/day</span></h2>
+
+      <div class="field">
+        <label for="pickup">Pickup date</label>
+        <input id="pickup" type="date" [(ngModel)]="pickupDate" />
+      </div>
+      <div class="field">
+        <label for="return">Return date</label>
+        <input id="return" type="date" [(ngModel)]="returnDate" />
+      </div>
+
+      @if (rentalDays() > 0) {
+        <p class="estimate">
+          {{ rentalDays() }} day{{ rentalDays() === 1 ? '' : 's' }} · estimated total
+          <strong>${{ estimatedTotal() }}</strong>
+        </p>
+      }
+
+      @if (dateError()) {
+        <p class="error-text">{{ dateError() }}</p>
+      }
+
+      <button class="btn full" type="button" (click)="proceedToCheckout()">Proceed to Checkout</button>
+      <p class="hint">You'll confirm your details and the exact price on the next step.</p>
+    </div>
+  </div>
+}
