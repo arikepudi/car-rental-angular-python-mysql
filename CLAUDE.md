@@ -20,7 +20,18 @@ ng test              # Vitest — currently only the default Angular CLI stub sp
                       # on "Hello, client" text that no longer exists since app.html was replaced)
 ```
 
-There is no linter configured in either project (no ESLint config in `client/`, no ruff/pytest in `server/`) and no real test suite yet.
+There is no linter configured in either project (no ESLint config in `client/`, no ruff/pytest in `server/`).
+
+**E2E regression suite (`e2e/`)** — a separate Node project (its own `package.json`), Playwright Test, run on demand before merging:
+
+```bash
+cd e2e
+npm install && npx playwright install chromium   # first time only
+npx playwright test          # runs headed (a real Chromium window opens) — see below, this is deliberate
+npx playwright show-report    # inspect trace/screenshot/video for the most recent run's failures
+```
+
+Needs `e2e/.env.test` (gitignored; `.env.test.example` has the placeholder) with `TEST_DATABASE_URL` — **a database that is not `server/.env`'s real `car_rental` database.** `e2e/global-setup.ts` refuses to run at all if the two URLs match, then truncates every table in the test database and reseeds it via `python -m app.seed` before every run. The suite starts its own frontend/backend instances on dedicated ports (`:4300`/`:8100` by default, see `e2e/playwright.config.ts`) so it never touches whatever dev servers are already running on `:4200`/`:8000`. `headless: false` is a deliberate, standing configuration choice, not a default left unconfigured — don't change it without the user asking. `e2e/` is never copied into the Docker image (see `Dockerfile`'s `COPY` lines) — it has no effect on what gets deployed.
 
 Full local + Docker + Render verification loop (what to run before believing a change works):
 
@@ -73,9 +84,12 @@ TLS is mandatory for the TiDB connection. `app/db.py` passes `certifi`'s CA bund
 - `core/compare.service.ts` — the car-comparison list (max 3), persisted to `localStorage`, deliberately not tied to the signed-in user — same reasoning as a shopping cart, it's a browsing convenience.
 - `core/booking-draft.service.ts` — in-memory (not persisted) hand-off of the selected car + dates from `pages/car-detail` to `pages/checkout`. If it's empty, checkout redirects back to browse rather than guessing.
 - `pages/` — `home` (browse/filter/sort), `car-detail` (car info + date selection), `compare` (side-by-side spec table, built dynamically from whatever `tags`/`metadata` keys are actually present across the selected cars — not a hardcoded column list), `checkout` (confirms details, submits the booking; the displayed total is an estimate only — the server recomputes the authoritative price), `booking-confirmation`, `my-bookings`, `login`/`signup`.
-- `shared/chat-widget/` — the FAQ/reservation chat widget's UI, mounted once in `app.html` (not per-page) so its conversation persists across navigation. Purely a thin caller of `ApiService.chat()`; all matching/grounding logic lives server-side (see the backend section above) — the frontend never decides what counts as a valid answer, it just displays `source`/`topic` from the response as a transparency caption on each bot message.
+- `shared/chat-widget/` — the FAQ/reservation chat widget's UI, mounted once in `app.html` (not per-page) so its conversation persists across navigation. Purely a thin caller of `ApiService.chat()`; all matching/grounding logic lives server-side (see the backend section above) — the frontend never decides what counts as a valid answer, it just displays `source`/`topic` from the response as a transparency caption on each bot message. Its toggle button and message input both carry explicit `aria-label`s (added alongside the e2e suite) — the toggle previously had only an emoji as its accessible name, a real accessibility gap, not just a test convenience.
+- The home page's car card (`pages/home/home.html`) carries `data-testid="car-card"`, added for the e2e suite (`e2e/pages/home.page.ts`) — one of the few places in this app where a `data-testid` was actually needed over a role/label selector, since it's a repeated grid item. Don't remove it without updating the e2e suite.
 - Routing is plain `provideRouter` (`app.routes.ts`), no route guards — pages that need a session check read `session.user()`/`session.whenReady` themselves (see `my-bookings.ts`).
 
 ## Origin
 
 Scaffolded via the `build-fullstack-angular-python-app` Claude Code skill (`~/.claude/skills/build-fullstack-angular-python-app/`), which encodes the reasoning behind most of the architecture choices above (why raw SQL over an ORM, why custom session auth over a library, the MySQL-specific gotchas, the Docker deploy approach). Consult that skill's reference docs before making structural changes that might contradict its guidance — e.g. reintroducing an ORM, switching to JWT-based auth, or changing the single-artifact production topology.
+
+The `e2e/` suite was built via the `e2e-test-suite-ui-playwright` Claude Code skill (`~/.claude/skills/e2e-test-suite-ui-playwright/`) — read its reference docs before adding new specs (the Page Object Model + selector conventions in particular) or touching `global-setup.ts`/`playwright.config.ts` (the test-database-isolation and headed-mode rules are non-negotiable, not defaults to reconsider).
