@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from .routes import auth_routes, bookings, cars
+from .routes import auth_routes, bookings, cars, chat
 from .schema import ensure_schema
 
 DIST_DIR = Path(__file__).resolve().parent.parent.parent / "client" / "dist" / "client" / "browser"
@@ -24,6 +24,7 @@ app.add_middleware(
 app.include_router(auth_routes.router, prefix="/api/auth")
 app.include_router(cars.router, prefix="/api/cars")
 app.include_router(bookings.router, prefix="/api/bookings")
+app.include_router(chat.router, prefix="/api/chat")
 
 if IS_PRODUCTION:
     # Angular's default build doesn't emit a browser/assets/ subfolder (only images/fonts

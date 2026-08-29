@@ -1,0 +1,138 @@
+:host {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 50;
+  display: block;
+}
+
+.toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  font-size: 1.4rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+}
+
+.toggle:hover {
+  background: var(--color-primary-dark);
+}
+
+.panel {
+  position: absolute;
+  right: 0;
+  bottom: 68px;
+  width: min(360px, calc(100vw - 2.5rem));
+  height: min(480px, calc(100vh - 8rem));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.header {
+  padding: 0.9rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  .subtitle {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.bubble {
+  max-width: 88%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+
+  p {
+    margin: 0;
+    white-space: pre-line;
+  }
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: white;
+}
+
+.bubble.bot {
+  align-self: flex-start;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.bubble.pending {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.tag {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.tag.muted {
+  color: var(--color-danger);
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0 1rem 0.6rem;
+}
+
+.chip {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--color-text);
+}
+
+.chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.composer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-border);
+
+  input {
+    flex: 1;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+  }
+
+  input:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+}

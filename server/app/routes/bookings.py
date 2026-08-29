@@ -3,30 +3,12 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 
-from ..booking_logic import cancellation_terms, compute_total
+from ..booking_logic import cancellation_terms, compute_total, serialize_booking
 from ..db import engine
 from ..deps import get_current_user, require_auth, verify_origin
 from ..schemas import BookingCreate
 
 router = APIRouter()
-
-
-def _serialize(row) -> dict:
-    terms = cancellation_terms(row["starts_at"], row["ends_at"], row["price_per_day"], row["total_price"])
-    return {
-        "id": row["id"],
-        "car_id": row["car_id"],
-        "car_name": row["car_name"],
-        "price_per_day": float(row["price_per_day"]),
-        "starts_at": row["starts_at"].isoformat(),
-        "ends_at": row["ends_at"].isoformat(),
-        "total_price": float(row["total_price"]),
-        "customer_name": row["customer_name"],
-        "email": row["email"],
-        "created_at": row["created_at"].isoformat(),
-        "cancellable": terms["cancellable"],
-        "cancellation_fee": float(terms["fee"]),
-    }
 
 
 @router.post("", dependencies=[Depends(verify_origin)])
@@ -76,7 +58,7 @@ def create_booking(payload: BookingCreate, user=Depends(get_current_user)):
             },
         )
         row = conn.execute(text("SELECT * FROM bookings WHERE id = :id"), {"id": booking_id}).mappings().first()
-        return _serialize(row)
+        return serialize_booking(row)
 
 
 @router.get("/mine")
@@ -88,7 +70,7 @@ def my_bookings(user=Depends(require_auth)):
             text("SELECT * FROM bookings WHERE user_id = :user_id ORDER BY created_at DESC"),
             {"user_id": user["id"]},
         ).mappings().all()
-    return [_serialize(r) for r in rows]
+    return [serialize_booking(r) for r in rows]
 
 
 @router.get("/{booking_id}")
@@ -97,7 +79,7 @@ def get_booking(booking_id: str):
         row = conn.execute(text("SELECT * FROM bookings WHERE id = :id"), {"id": booking_id}).mappings().first()
     if row is None:
         raise HTTPException(status_code=404, detail="Booking not found")
-    return _serialize(row)
+    return serialize_booking(row)
 
 
 @router.delete("/{booking_id}", dependencies=[Depends(verify_origin)])

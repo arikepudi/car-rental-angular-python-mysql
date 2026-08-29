@@ -1,0 +1,61 @@
+<button class="toggle" type="button" (click)="toggle()" [attr.aria-expanded]="open()">
+  @if (open()) {
+    ✕
+  } @else {
+    💬
+  }
+</button>
+
+@if (open()) {
+  <div class="panel card">
+    <div class="header">
+      <strong>RoadReady Assistant</strong>
+      <span class="subtitle">Answers from our FAQ and your reservations only</span>
+    </div>
+
+    <div class="messages">
+      @for (msg of messages(); track $index) {
+        <div class="bubble" [class.user]="msg.role === 'user'" [class.bot]="msg.role === 'bot'">
+          <p>{{ msg.text }}</p>
+          @if (msg.role === 'bot' && msg.source && msg.source !== 'none') {
+            <span class="tag">
+              {{
+                msg.source === 'faq'
+                  ? 'From FAQ: ' + msg.topic
+                  : msg.source === 'reservation'
+                    ? 'From your reservation data'
+                    : 'Live catalog data'
+              }}
+            </span>
+          }
+          @if (msg.role === 'bot' && msg.source === 'none') {
+            <span class="tag muted">Not covered by our FAQ</span>
+          }
+        </div>
+      }
+      @if (sending()) {
+        <div class="bubble bot pending">Thinking…</div>
+      }
+      <div #scrollAnchor></div>
+    </div>
+
+    @if (messages().length <= 2) {
+      <div class="suggestions">
+        @for (s of suggestions; track s) {
+          <button class="chip" type="button" (click)="sendSuggestion(s)">{{ s }}</button>
+        }
+      </div>
+    }
+
+    <form class="composer" (submit)="$event.preventDefault(); send()">
+      <input
+        type="text"
+        placeholder="Ask a question…"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+        name="chatDraft"
+      />
+      <button class="btn" type="submit" [disabled]="sending() || !draft().trim()">Send</button>
+    </form>
+  </div>
+}

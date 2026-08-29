@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Booking, Car, CarFilters, User } from './models';
+import { Booking, Car, CarFilters, ChatReply, User } from './models';
 
 function toParams(obj: Record<string, unknown>): HttpParams {
   let params = new HttpParams();
@@ -65,5 +65,9 @@ export class ApiService {
 
   signOut(): Observable<{ signed_out: boolean }> {
     return this.http.post<{ signed_out: boolean }>('/api/auth/sign-out', {});
+  }
+
+  chat(message: string): Observable<ChatReply> {
+    return this.http.post<ChatReply>('/api/chat', { message });
   }
 }

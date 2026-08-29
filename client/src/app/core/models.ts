@@ -39,3 +39,11 @@ export interface CarFilters {
   starts_at?: string;
   ends_at?: string;
 }
+
+export type ChatSource = 'faq' | 'reservation' | 'catalog' | 'none';
+
+export interface ChatReply {
+  reply: string;
+  source: ChatSource;
+  topic?: string;
+}

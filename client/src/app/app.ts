@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { SessionService } from './core/session.service';
+import { ChatWidget } from './shared/chat-widget/chat-widget';
 import { Header } from './shared/header/header';
 
 @Component({
-  imports: [RouterOutlet, Header],
+  imports: [RouterOutlet, Header, ChatWidget],
   selector: 'app-root',
   styleUrl: './app.scss',
   templateUrl: './app.html',
