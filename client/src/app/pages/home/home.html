@@ -41,7 +41,7 @@
 } @else {
   <div class="grid">
     @for (car of visibleCars(); track car.id) {
-      <a class="car-card card" [routerLink]="['/cars', car.id]">
+      <a class="car-card card" data-testid="car-card" [routerLink]="['/cars', car.id]">
         <img [src]="car.image" [alt]="car.name" />
         <div class="body">
           <div class="title-row">

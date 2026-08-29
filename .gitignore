@@ -7,5 +7,11 @@ __pycache__/
 .env
 .env.*
 !.env.example
+!.env.test.example
 .DS_Store
 *.log
+
+# Playwright (e2e/)
+e2e/test-results/
+e2e/playwright-report/
+e2e/blob-report/

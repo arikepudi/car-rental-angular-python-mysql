@@ -1,4 +1,4 @@
-<button class="toggle" type="button" (click)="toggle()" [attr.aria-expanded]="open()">
+<button class="toggle" type="button" (click)="toggle()" [attr.aria-expanded]="open()" aria-label="Toggle chat assistant">
   @if (open()) {
     ✕
   } @else {
@@ -51,6 +51,7 @@
       <input
         type="text"
         placeholder="Ask a question…"
+        aria-label="Chat message"
         [ngModel]="draft()"
         (ngModelChange)="draft.set($event)"
         name="chatDraft"
