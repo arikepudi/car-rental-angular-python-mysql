@@ -8,6 +8,7 @@ __pycache__/
 .env.*
 !.env.example
 !.env.test.example
+!.env.loadtest.example
 .DS_Store
 *.log
 
@@ -15,3 +16,6 @@ __pycache__/
 e2e/test-results/
 e2e/playwright-report/
 e2e/blob-report/
+
+# k6 (perf/)
+perf/reports/
